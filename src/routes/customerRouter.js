@@ -6,5 +6,6 @@ import { createCustomer, getAllCustomer, updateCustomer } from '../controllers/c
 router.post('/create', createCustomer);
 router.get('/getAll', getAllCustomer);
 router.patch('/update/:id', updateCustomer);
+router.patch('/final-register/:token', updateCustomer);
 
 export default router;

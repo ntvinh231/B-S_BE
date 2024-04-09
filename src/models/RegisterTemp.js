@@ -35,7 +35,13 @@ const deleteExpiredTokens = async () => {
 	try {
 		const currentDate = new Date();
 		// Xóa tất cả các bản ghi có thời gian hết hạn ít hơn thời điểm hiện tại
-		await register.deleteMany({ tokenRegisterExpires: { $lt: currentDate } });
+		register.deleteMany({ tokenRegisterExpires: { $lt: currentDate } }, (error, result) => {
+			if (error) {
+				console.error('Lỗi khi xóa các bản ghi hết hạn:', error);
+			} else {
+				console.log(`${result.deletedCount} bản ghi đã được xóa.`);
+			}
+		});
 	} catch (error) {
 		console.error('Lỗi khi xóa các bản ghi hết hạn:', error);
 	}
