@@ -7,6 +7,8 @@ import connection from './src/database/connection.js';
 import userRouter from './src/routes/userRouter.js';
 import fakeRouteRouter from './src/routes/FakeRouter.js';
 import customerRouter from './src/routes/customerRouter.js';
+import projectRouter from './src/routes/projectRouter.js';
+import typeRouter from './src/routes/typeRouter.js';
 
 const app = express();
 
@@ -37,6 +39,8 @@ app.get('/', (req, res) => {
 //config file upload
 
 app.use('/api/user', userRouter);
+app.use('/api/project', projectRouter);
+app.use('/api/type', typeRouter);
 app.use('/api/customer', customerRouter);
 app.use('/', fakeRouteRouter);
 // 404 handler and pass to error handler

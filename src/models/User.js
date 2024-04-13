@@ -12,7 +12,7 @@ const userSchema = new mongoose.Schema({
 	address: { type: String, maxLength: 50 },
 	date: { type: Date },
 	revenue: { type: Number },
-	role: { type: String, enum: ['admin', 'staff', 'client'], default: 'staff', select: false },
+	role: { type: String, enum: ['admin', 'staff'], default: 'staff', select: false },
 	passwordChangedAt: Date,
 	passwordResetToken: String,
 	passwordResetExpires: Date,
