@@ -26,5 +26,8 @@ router.post('/signup', signUp);
 router.post('/signin', signIn);
 router.post('/forgot-password', forgotPassword);
 router.patch('/reset-password/:token', resetPassword);
-
+router.post('/loggout', loggout);
+router.use(isLoggedIn);
+router.get('/getAll', isLoggedIn, getAllUser);
+router.get('/details/:id', isLoggedIn, getDetailsUser);
 export default router;

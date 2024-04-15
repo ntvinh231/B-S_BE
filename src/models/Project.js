@@ -2,14 +2,15 @@ import mongoose from 'mongoose';
 
 const projectSchema = new mongoose.Schema(
 	{
-		state: { type: String },
+		name: { type: String },
+		state: { type: Boolean },
 		acreage: { type: String },
-		price: { type: String },
+		price: { type: Number },
 		image: { type: String },
 		description: { type: String },
 		address: { type: String },
-		typeId: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Customer' }],
-		customerId: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Type' }],
+		typeId: { type: mongoose.Schema.Types.ObjectId, ref: 'Customer' },
+		customerId: { type: mongoose.Schema.Types.ObjectId, ref: 'Type' },
 	},
 	{
 		timestamps: true,
