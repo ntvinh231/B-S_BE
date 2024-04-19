@@ -62,6 +62,7 @@ export const createCustomer = async (req, res, next) => {
 export const getAllCustomer = async (req, res, next) => {
 	const { filter, limit, sort } = apq(req.query);
 
+	if (typeof filter.status !== 'boolean') delete filter.status;
 	if (filter.email) {
 		filter.email = { $regex: new RegExp(filter.email, 'i') };
 	}

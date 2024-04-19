@@ -6,6 +6,8 @@ const customerSchema = new mongoose.Schema(
 		email: { type: String },
 		phone: { type: String },
 		name: { type: String },
+		subject: { type: String },
+		message: { type: String },
 		status: { type: Boolean, default: false },
 	},
 	{

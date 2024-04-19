@@ -5,7 +5,7 @@ import uploader from '../middleware/uploader.js';
 
 const router = express.Router();
 
-router.post('/create', isLoggedIn, uploader.single('image'), createProject);
+router.post('/create', isLoggedIn, uploader.array('image', 10), createProject);
 router.get('/getAll', isLoggedIn, getAllProject);
 router.patch('/update', isLoggedIn, updateProject);
 router.delete('/delete', isLoggedIn, deleteProject);

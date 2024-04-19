@@ -1,16 +1,17 @@
 import Project from '../models/Project.js';
 import apq from 'api-query-params';
 import { v2 as cloudinary } from 'cloudinary';
-
+import httpError from 'http-errors';
 export const createProject = async (req, res, next) => {
+	let fileData;
 	try {
-		const fileData = req.file;
+		fileData = req.files;
 
 		const {
 			name,
 			state,
 			acreage,
-			image = fileData?.path || '',
+			image = fileData?.map((file) => file.path) || [],
 			price,
 			description,
 			address,
@@ -19,7 +20,7 @@ export const createProject = async (req, res, next) => {
 		} = req.body;
 
 		if (!state || !acreage || !price || !image || !description || !address || !typeId || !customerId) {
-			cloudinary.uploader.destroy(fileData.filename);
+			fileData.forEach((file) => cloudinary.uploader.destroy(file.filename));
 			return res.status(200).json({
 				statusCode: 400,
 				statusMessage: 'failed',
@@ -48,7 +49,7 @@ export const createProject = async (req, res, next) => {
 		});
 	} catch (error) {
 		console.log(error);
-		cloudinary.uploader.destroy(fileData.filename);
+		fileData.forEach((file) => cloudinary.uploader.destroy(file.filename));
 		return next(httpError(400, error));
 	}
 };
