@@ -2,25 +2,18 @@ import Project from '../models/Project.js';
 import apq from 'api-query-params';
 import { v2 as cloudinary } from 'cloudinary';
 import httpError from 'http-errors';
+
 export const createProject = async (req, res, next) => {
 	let fileData;
 	try {
-		fileData = req.files;
+		const fileData = req.files;
 
-		const {
-			name,
-			state,
-			acreage,
-			image = fileData?.map((file) => file.path) || [],
-			price,
-			description,
-			address,
-			typeId,
-			customerId,
-		} = req.body;
+		const { name, status, acreage, price, address, typeId } = req.body;
 
-		if (!state || !acreage || !price || !image || !description || !address || !typeId || !customerId) {
-			fileData.forEach((file) => cloudinary.uploader.destroy(file.filename));
+		if (!status || !acreage || !price || !fileData || !address || !typeId) {
+			if (fileData) {
+				fileData.forEach((file) => cloudinary.uploader.destroy(file.filename));
+			}
 			return res.status(200).json({
 				statusCode: 400,
 				statusMessage: 'failed',
@@ -30,18 +23,28 @@ export const createProject = async (req, res, next) => {
 
 		const checkProjectName = await Project.findOne({ name });
 		if (checkProjectName) {
-			return res.status(200).json({
+			return res.status(400).json({
 				statusCode: 400,
 				statusMessage: 'failed',
 				message: 'Tên bất động sản này đã tồn tại.',
 			});
 		}
+
 		const newProject = new Project({
-			...req.body,
-			image,
+			name,
+			status,
+			acreage,
+			price,
+			address,
+			typeId,
+			images: fileData.map((file) => {
+				return file.path;
+			}),
 		});
+
 		await newProject.save();
-		return res.status(200).json({
+
+		return res.status(201).json({
 			statusCode: 201,
 			statusMessage: 'success',
 			message: 'Thêm thành công loại hình bất động sản',
@@ -49,7 +52,9 @@ export const createProject = async (req, res, next) => {
 		});
 	} catch (error) {
 		console.log(error);
-		fileData.forEach((file) => cloudinary.uploader.destroy(file.filename));
+		if (fileData) {
+			fileData.forEach((file) => cloudinary.uploader.destroy(file.filename));
+		}
 		return next(httpError(400, error));
 	}
 };
@@ -94,7 +99,6 @@ export const getAllProject = async (req, res, next) => {
 			statusMessage: 'failed',
 			message: error.message,
 		});
-		return httpError(400, error);
 	}
 };
 

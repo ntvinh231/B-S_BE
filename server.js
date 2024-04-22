@@ -9,6 +9,7 @@ import fakeRouteRouter from './src/routes/FakeRouter.js';
 import customerRouter from './src/routes/customerRouter.js';
 import projectRouter from './src/routes/projectRouter.js';
 import typeRouter from './src/routes/typeRouter.js';
+import depositContract from './src/routes/depositContract.js';
 
 const app = express();
 
@@ -42,6 +43,7 @@ app.use('/api/user', userRouter);
 app.use('/api/project', projectRouter);
 app.use('/api/type', typeRouter);
 app.use('/api/customer', customerRouter);
+app.use('/api/deposit-contract', depositContract);
 app.use('/', fakeRouteRouter);
 // 404 handler and pass to error handler
 app.all('*', (req, res, next) => {

@@ -3,10 +3,10 @@ import mongoose from 'mongoose';
 const projectSchema = new mongoose.Schema(
 	{
 		name: { type: String },
-		state: { type: Boolean },
+		status: { type: String },
 		acreage: { type: String },
 		price: { type: Number },
-		image: { type: Array },
+		images: { type: Array },
 		description: { type: String },
 		address: { type: String },
 		typeId: { type: mongoose.Schema.Types.ObjectId, ref: 'Customer' },
