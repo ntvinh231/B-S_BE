@@ -32,17 +32,29 @@ export const createCustomer = async (req, res, next) => {
 				message: 'Số điện thoại không hợp lệ.Vui lòng nhập số điện thoại hợp lệ',
 			});
 		}
-		//else {
-		// 	if (phone.startsWith('0')) {
-		// 		phone = '+84' + phone.slice(1);
-		// 	}
-		// }
 
 		if (name.length < 3 || name.length > 30) {
 			return res.status(200).json({
 				statusCode: 400,
 				statusMessage: 'failed',
 				message: 'Tên không hợp lệ. Tên phải có từ 3 đến 30 ký tự.',
+			});
+		}
+
+		const existingEmail = await Customer.findOne({ email: email });
+		if (existingEmail) {
+			return res.status(200).json({
+				statusCode: 400,
+				statusMessage: 'failed',
+				message: 'Email already exists in the system. Please use another email.',
+			});
+		}
+		const existingPhone = await Customer.findOne({ phone: phone });
+		if (existingPhone) {
+			return res.status(200).json({
+				statusCode: 400,
+				statusMessage: 'failed',
+				message: 'The phone number already exists in the system. Please use another phone number.',
 			});
 		}
 

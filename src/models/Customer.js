@@ -16,6 +16,6 @@ const customerSchema = new mongoose.Schema(
 );
 
 customerSchema.plugin(mongoose_delete, { overrideMethods: 'all' });
-const customer = mongoose.model('customer', customerSchema);
+const Customer = mongoose.model('Customer', customerSchema);
 
-export default customer;
+export default Customer;

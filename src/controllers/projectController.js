@@ -101,6 +101,30 @@ export const getAllProject = async (req, res, next) => {
 		});
 	}
 };
+export const getProjetById = async (req, res, next) => {
+	try {
+		const project = await Project.findById(req.params.id);
+		if (!project) {
+			return res.status(200).json({
+				statusCode: 404,
+				statusMessage: 'failed',
+				message: 'Not found',
+			});
+		}
+		return res.status(200).json({
+			statusCode: 200,
+			statusMessage: 'success',
+			data: project,
+		});
+	} catch (error) {
+		console.log(error);
+		return res.status(200).json({
+			statusCode: 400,
+			statusMessage: 'failed',
+			message: error.message,
+		});
+	}
+};
 
 export const updateProject = async (req, res, next) => {
 	try {

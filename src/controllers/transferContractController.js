@@ -1,9 +1,9 @@
 import httpError from 'http-errors';
+import TransferContract from '../models/TransferContract.js';
 import DepositContract from '../models/DepositContract.js';
 import apq from 'api-query-params';
-import transferContract from '../models/TransferContract.js';
 
-export const createDepositContract = async (req, res, next) => {
+export const createTransferContract = async (req, res, next) => {
 	try {
 		const { value, expires, propertyId, customerId } = req.body;
 
@@ -23,21 +23,33 @@ export const createDepositContract = async (req, res, next) => {
 			});
 		}
 
+		const checkExistDeposit = await DepositContract.findOne({
+			propertyId: propertyId,
+		});
+		console.log(checkExistDeposit);
+		if (!checkExistDeposit) {
+			return res.status(200).json({
+				statusCode: 400,
+				statusMessage: 'failed',
+				message: 'This property does not have a deposit contract.',
+			});
+		}
+
 		const expiresDate = new Date(expires);
 		expiresDate.setDate(expiresDate.getDate() + 1);
 		expiresDate.setHours(0, 0, 0, 0);
 
-		const depositContract = new DepositContract({
+		const transferContract = new TransferContract({
 			value,
 			propertyId,
 			customerId,
 			expires: expiresDate,
 		});
-		await depositContract.save();
+		await transferContract.save();
 		return res.status(200).json({
 			statusCode: 201,
 			statusMessage: 'success',
-			message: 'Successfully created deposit contract',
+			message: 'Successfully created transfer contract',
 		});
 	} catch (error) {
 		console.log(error);
@@ -45,13 +57,13 @@ export const createDepositContract = async (req, res, next) => {
 	}
 };
 
-export const getAllDepositContract = async (req, res, next) => {
+export const getAllTransferContract = async (req, res, next) => {
 	const { filter, limit, sort } = apq(req.query);
 
 	if (typeof filter.status !== 'boolean') delete filter.status;
 
 	try {
-		const result = await DepositContract.find(filter)
+		const result = await TransferContract.find(filter)
 			.populate({
 				path: 'customerId',
 				select: 'name',
@@ -60,6 +72,7 @@ export const getAllDepositContract = async (req, res, next) => {
 				path: 'propertyId',
 				select: 'name',
 			});
+
 		return res.status(200).json({
 			statusCode: 200,
 			statusMessage: 'success',
@@ -71,15 +84,15 @@ export const getAllDepositContract = async (req, res, next) => {
 	}
 };
 
-export const getDepositContractByPropertyId = async (req, res, next) => {
+export const getTransferContractByPropertyId = async (req, res, next) => {
 	const { id } = req.body;
 
-	const result = await DepositContract.findOne({ propertyId: id });
+	const result = await TransferContract.findOne({ propertyId: id });
 	if (!result) {
 		return res.status(200).json({
 			statusCode: 404,
 			statusMessage: 'failed',
-			message: 'Deposit contract not found',
+			message: 'Transfer contract not found',
 		});
 	}
 	return res.status(200).json({
@@ -89,10 +102,10 @@ export const getDepositContractByPropertyId = async (req, res, next) => {
 	});
 };
 
-export const getDepositContractById = async (req, res, next) => {
+export const getTransferContractById = async (req, res, next) => {
 	const { id } = req.body;
 
-	const result = await DepositContract.findOne({ _id: id })
+	const result = await TransferContract.findOne({ _id: id })
 		.populate({
 			path: 'customerId',
 			select: 'name',
@@ -105,7 +118,7 @@ export const getDepositContractById = async (req, res, next) => {
 		return res.status(200).json({
 			statusCode: 404,
 			statusMessage: 'failed',
-			message: 'Deposit contract not found',
+			message: 'Transfer contract not found',
 		});
 	}
 	return res.status(200).json({

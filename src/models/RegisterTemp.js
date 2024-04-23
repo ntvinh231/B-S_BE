@@ -12,7 +12,7 @@ const registerTempSchema = new mongoose.Schema({
 	gender: { type: Number },
 	email: { type: String, maxLength: 255 },
 	revenue: { type: Number },
-	role: { type: String, enum: ['admin', 'staff', 'client'], default: 'client', select: false },
+	role: { type: String, enum: ['admin', 'staff'], default: 'staff', select: false },
 	tokenRegister: String,
 	tokenRegisterExpires: Date,
 	refreshToken: String,
