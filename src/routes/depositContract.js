@@ -2,6 +2,7 @@ import express from 'express';
 import isLoggedIn from '../middleware/isLoggedIn.js';
 import {
 	createDepositContract,
+	deleteDeposit,
 	getAllDepositContract,
 	getDepositContractById,
 	getDepositContractByPropertyId,
@@ -12,7 +13,6 @@ router.post('/create', isLoggedIn, createDepositContract);
 router.get('/getAll', isLoggedIn, getAllDepositContract);
 router.post('/getById', isLoggedIn, getDepositContractById);
 router.post('/getByPropertyId', isLoggedIn, getDepositContractByPropertyId);
-// router.patch('/update/:id', updateCustomer);
-// router.patch('/final-register/:token', updateCustomer);
+router.delete('/delete', isLoggedIn, deleteDeposit);
 
 export default router;

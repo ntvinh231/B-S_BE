@@ -1,12 +1,12 @@
 import httpError from 'http-errors';
-import DepositContract from '../models/DepositContract.js';
-import apq from 'api-query-params';
 import ConsignmentContract from '../models/ConsignmentContract.js';
-export const createDepositContract = async (req, res, next) => {
-	try {
-		const { value, expires, propertyId, customerId } = req.body;
+import apq from 'api-query-params';
 
-		if (!value || !expires || !propertyId || !customerId) {
+export const createConsignmentContract = async (req, res, next) => {
+	try {
+		const { serviceCost, expires, propertyId, customerId } = req.body;
+
+		if (!serviceCost || !expires || !propertyId || !customerId) {
 			return res.status(200).json({
 				statusCode: 400,
 				statusMessage: 'failed',
@@ -14,7 +14,7 @@ export const createDepositContract = async (req, res, next) => {
 			});
 		}
 
-		if (isNaN(value)) {
+		if (isNaN(serviceCost)) {
 			return res.status(200).json({
 				statusCode: 400,
 				statusMessage: 'failed',
@@ -22,27 +22,17 @@ export const createDepositContract = async (req, res, next) => {
 			});
 		}
 
-		const checkExist = await ConsignmentContract.findOne({ propertyId });
-
-		if (!checkExist) {
-			return res.status(200).json({
-				statusCode: 400,
-				statusMessage: 'failed',
-				message: 'This product that have not been consignment contract',
-			});
-		}
-
 		const expiresDate = new Date(expires);
 		expiresDate.setDate(expiresDate.getDate() + 1);
 		expiresDate.setHours(0, 0, 0, 0);
 
-		const depositContract = new DepositContract({
-			value,
+		const consignmentContract = new ConsignmentContract({
+			serviceCost,
 			propertyId,
 			customerId,
 			expires: expiresDate,
 		});
-		await depositContract.save();
+		await consignmentContract.save();
 		return res.status(200).json({
 			statusCode: 201,
 			statusMessage: 'success',
@@ -54,13 +44,31 @@ export const createDepositContract = async (req, res, next) => {
 	}
 };
 
-export const getAllDepositContract = async (req, res, next) => {
+export const getConsignmentByPropertyId = async (req, res, next) => {
+	const { id } = req.body;
+
+	const result = await ConsignmentContract.findOne({ propertyId: id });
+	if (!result) {
+		return res.status(200).json({
+			statusCode: 404,
+			statusMessage: 'failed',
+			message: 'Consignment contract not found',
+		});
+	}
+	return res.status(200).json({
+		statusCode: 200,
+		statusMessage: 'success',
+		data: result,
+	});
+};
+
+export const getAllConsignmentContract = async (req, res, next) => {
 	const { filter, limit, sort } = apq(req.query);
 
 	if (typeof filter.status !== 'boolean') delete filter.status;
 
 	try {
-		const result = await DepositContract.find(filter)
+		const result = await ConsignmentContract.find(filter)
 			.populate({
 				path: 'customerId',
 				select: 'name',
@@ -81,28 +89,10 @@ export const getAllDepositContract = async (req, res, next) => {
 	}
 };
 
-export const getDepositContractByPropertyId = async (req, res, next) => {
+export const getConsignmentContractById = async (req, res, next) => {
 	const { id } = req.body;
 
-	const result = await DepositContract.findOne({ propertyId: id });
-	if (!result) {
-		return res.status(200).json({
-			statusCode: 404,
-			statusMessage: 'failed',
-			message: 'Deposit contract not found',
-		});
-	}
-	return res.status(200).json({
-		statusCode: 200,
-		statusMessage: 'success',
-		data: result,
-	});
-};
-
-export const getDepositContractById = async (req, res, next) => {
-	const { id } = req.body;
-
-	const result = await DepositContract.findOne({ _id: id })
+	const result = await ConsignmentContract.findOne({ _id: id })
 		.populate({
 			path: 'customerId',
 			select: 'name',
@@ -115,7 +105,7 @@ export const getDepositContractById = async (req, res, next) => {
 		return res.status(200).json({
 			statusCode: 404,
 			statusMessage: 'failed',
-			message: 'Deposit contract not found',
+			message: 'Consignment contract not found',
 		});
 	}
 	return res.status(200).json({
@@ -125,19 +115,19 @@ export const getDepositContractById = async (req, res, next) => {
 	});
 };
 
-export const deleteDeposit = async (req, res, next) => {
+export const deleteConsignment = async (req, res, next) => {
 	try {
 		const { id } = req.body;
-		const Deposit = await Deposit.findById(id);
-		if (!customer) {
+		const consignment = await Project.findById(id);
+		if (!consignment) {
 			return res.status(200).json({
 				statusCode: 404,
 				statusMessage: 'failed',
-				message: 'Not found Deposit.',
+				message: 'Not found Consignment.',
 			});
 		}
 
-		const result = await Deposit.deleteOne({ _id: id });
+		const result = await ConsignmentContract.deleteOne({ _id: id });
 
 		return res.status(200).json({
 			statusCode: 200,

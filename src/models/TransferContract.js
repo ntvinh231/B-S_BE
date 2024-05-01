@@ -41,6 +41,6 @@ transferContractSchema.virtual('nameProperty', {
 
 transferContractSchema.set('toObject', { getters: true, virtuals: true });
 transferContractSchema.set('toJSON', { getters: true, virtuals: true });
-const transferContract = mongoose.model('transferContract', transferContractSchema);
+const transferContract = mongoose.model('TransferContract', transferContractSchema);
 
 export default transferContract;

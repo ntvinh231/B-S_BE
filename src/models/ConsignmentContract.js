@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
-const depositContractSchema = new mongoose.Schema(
+const consignmentContractSchema = new mongoose.Schema(
 	{
-		value: { type: Number },
+		serviceCost: { type: Number },
 		expires: { type: Date },
 		propertyId: { type: mongoose.Schema.Types.ObjectId, ref: 'Project' },
 		customerId: { type: mongoose.Schema.Types.ObjectId, ref: 'Customer' },
@@ -10,8 +10,7 @@ const depositContractSchema = new mongoose.Schema(
 		timestamps: true,
 	}
 );
-
-depositContractSchema.virtual('expirationDate').get(function () {
+consignmentContractSchema.virtual('expirationDate').get(function () {
 	const now = new Date();
 	const timeDifferenceInSeconds = Math.floor((this.expires - now) / 1000);
 	const daysLeft = Math.floor(timeDifferenceInSeconds / (24 * 3600));
@@ -24,22 +23,22 @@ depositContractSchema.virtual('expirationDate').get(function () {
 	};
 });
 
-depositContractSchema.virtual('nameCustomer', {
+consignmentContractSchema.virtual('nameCustomer', {
 	ref: 'Customer',
 	localField: 'customerId',
 	foreignField: '_id',
 	justOne: true,
 });
 
-depositContractSchema.virtual('nameProperty', {
+consignmentContractSchema.virtual('nameProperty', {
 	ref: 'Project',
 	localField: 'propertyId',
 	foreignField: '_id',
 	justOne: true,
 });
 
-depositContractSchema.set('toObject', { getters: true, virtuals: true });
-depositContractSchema.set('toJSON', { getters: true, virtuals: true });
-const depositContract = mongoose.model('DepositContract', depositContractSchema);
+consignmentContractSchema.set('toObject', { getters: true, virtuals: true });
+consignmentContractSchema.set('toJSON', { getters: true, virtuals: true });
+const consignmentContract = mongoose.model('ConsignmentContract', consignmentContractSchema);
 
-export default depositContract;
+export default consignmentContract;

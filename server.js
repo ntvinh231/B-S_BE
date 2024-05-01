@@ -11,6 +11,7 @@ import projectRouter from './src/routes/projectRouter.js';
 import typeRouter from './src/routes/typeRouter.js';
 import depositContract from './src/routes/depositContract.js';
 import transferContract from './src/routes/transferContract.js';
+import consignmentContract from './src/routes/consignmentContract.js';
 
 const app = express();
 
@@ -45,6 +46,7 @@ app.use('/api/project', projectRouter);
 app.use('/api/type', typeRouter);
 app.use('/api/customer', customerRouter);
 app.use('/api/deposit-contract', depositContract);
+app.use('/api/consignment-contract', consignmentContract);
 app.use('/api/transfer-contract', transferContract);
 app.use('/', fakeRouteRouter);
 // 404 handler and pass to error handler

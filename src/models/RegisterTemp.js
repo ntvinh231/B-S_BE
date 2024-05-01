@@ -28,7 +28,7 @@ registerTempSchema.methods.createRegisterTempToken = async function () {
 };
 
 registerTempSchema.plugin(mongoose_delete, { overrideMethods: 'all' });
-const register = mongoose.model('register', registerTempSchema);
+const register = mongoose.model('Register', registerTempSchema);
 
 // Hàm để tự động xóa các bản ghi
 const deleteExpiredTokens = async () => {

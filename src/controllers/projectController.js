@@ -59,16 +59,117 @@ export const createProject = async (req, res, next) => {
 	}
 };
 
-export const getAllProject = async (req, res, next) => {
-	try {
-		const { filter, limit, sort } = apq(req.query);
+const getPublicIdFromUrl = (url) => {
+	const parts = url.split('/');
 
-		if (filter.name) {
-			filter.name = { $regex: new RegExp(filter.name, 'i') };
+	const filename = parts.pop();
+
+	const publicId = filename.slice(0, filename.lastIndexOf('.'));
+	return publicId;
+};
+
+const isAddressComplete = (address) => {
+	return address.province.provinceCode && address.district.districtCode && address.ward.wardCode;
+};
+export const updateProject = async (req, res, next) => {
+	const files = req.files;
+	try {
+		const { id } = req.body;
+		const { name, status, acreage, price, address, typeId } = req.body;
+
+		const existingProject = await Project.findById(id);
+		if (!existingProject) {
+			if (files) {
+				files.forEach((file) => cloudinary.uploader.destroy(file.filename));
+			}
+			return res.status(200).json({
+				statusCode: 404,
+				statusMessage: 'failed',
+				message: 'No property found to update..',
+			});
 		}
 
-		if (filter.price) {
-			const match = filter.price.match(/^(gt|lt|gte|lte)_(\d+)$/); // Phân tích giá trị
+		if (!isAddressComplete(address)) {
+			return res.status(200).json({
+				statusCode: 400,
+				statusMessage: 'failed',
+				message: 'Please complete the updated address.',
+			});
+		}
+
+		// Xóa các ảnh cũ từ cloudinary
+		await Promise.all(
+			existingProject.images.map(async (imagePath) => {
+				await cloudinary.uploader.destroy(getPublicIdFromUrl(imagePath));
+			})
+		);
+
+		if (name) existingProject.name = name;
+		if (status) existingProject.status = status;
+		if (acreage) existingProject.acreage = acreage;
+		if (price) existingProject.price = price;
+		if (address) existingProject.address = address;
+		if (typeId) existingProject.typeId = typeId;
+
+		// Thêm ảnh mới sau khi xóa ảnh cũ
+		if (files && files.length) {
+			const newImages = files.map((file) => file.path);
+			existingProject.images = newImages;
+		}
+
+		await existingProject.save();
+
+		return res.status(200).json({
+			statusCode: 200,
+			statusMessage: 'success',
+			message: 'Cập nhật dự án thành công.',
+			data: existingProject,
+		});
+	} catch (error) {
+		console.error(error);
+		if (files) {
+			files.forEach((file) => cloudinary.uploader.destroy(file.filename));
+		}
+		return next(httpError(400, error));
+	}
+};
+
+export const getAllProject = async (req, res, next) => {
+	try {
+		const { provinceCode, districtCode, wardCode, name, price, typeId, status } = req.query;
+
+		const filter = {};
+		// Tìm kiếm theo typeId
+		if (typeId) {
+			filter.typeId = typeId;
+		}
+
+		// Tìm kiếm theo status
+		if (status) {
+			filter.status = status;
+		}
+
+		// Tìm kiếm theo tỉnh/thành phố
+		if (provinceCode) {
+			filter['address.province.provinceCode'] = parseInt(provinceCode);
+		}
+
+		// Tìm kiếm theo quận/huyện
+		if (districtCode) {
+			filter['address.district.districtCode'] = parseInt(districtCode);
+		}
+
+		// Tìm kiếm theo xã/phường
+		if (wardCode) {
+			filter['address.ward.wardCode'] = parseInt(wardCode);
+		}
+
+		if (name) {
+			filter.name = { $regex: new RegExp(name, 'i') };
+		}
+
+		if (price) {
+			const match = price.match(/^(gt|lt|gte|lte)_(\d+)$/);
 			if (match) {
 				const operator = match[1];
 				const value = parseInt(match[2]);
@@ -86,11 +187,21 @@ export const getAllProject = async (req, res, next) => {
 			}
 		}
 
-		const project = await Project.find(filter);
+		const projects = await Project.find(filter)
+			.populate({
+				path: 'typeName',
+				select: 'name -_id',
+				options: { lean: true },
+			})
+			.then((projects) =>
+				projects.map((project) => {
+					return { ...project.toObject(), typeName: project.typeName.name };
+				})
+			);
 		return res.status(200).json({
 			statusCode: 200,
 			statusMessage: 'success',
-			data: project,
+			data: projects,
 		});
 	} catch (error) {
 		console.log(error);
@@ -101,6 +212,7 @@ export const getAllProject = async (req, res, next) => {
 		});
 	}
 };
+
 export const getProjetById = async (req, res, next) => {
 	try {
 		const project = await Project.findById(req.params.id);
@@ -115,38 +227,6 @@ export const getProjetById = async (req, res, next) => {
 			statusCode: 200,
 			statusMessage: 'success',
 			data: project,
-		});
-	} catch (error) {
-		console.log(error);
-		return res.status(200).json({
-			statusCode: 400,
-			statusMessage: 'failed',
-			message: error.message,
-		});
-	}
-};
-
-export const updateProject = async (req, res, next) => {
-	try {
-		const { id } = req.body;
-		const project = await Project.findById(id);
-		if (!project) {
-			return res.status(200).json({
-				statusCode: 404,
-				statusMessage: 'failed',
-				message: 'Không tìm thấy bất động sản này.',
-			});
-		}
-
-		const updateProject = await Project.findByIdAndUpdate(id, req.body, {
-			new: true,
-		});
-
-		return res.status(200).json({
-			statusCode: 200,
-			statusMessage: 'success',
-			message: 'Sửa thành công bất động sản.',
-			data: updateProject,
 		});
 	} catch (error) {
 		console.log(error);

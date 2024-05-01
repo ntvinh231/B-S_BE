@@ -10,6 +10,6 @@ const typeSchemna = new mongoose.Schema(
 	}
 );
 
-const type = mongoose.model('type', typeSchemna);
+const type = mongoose.model('Type', typeSchemna);
 
 export default type;

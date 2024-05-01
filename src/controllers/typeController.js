@@ -48,6 +48,17 @@ export const getAllType = async (req, res, next) => {
 	});
 };
 
+export const getTypeById = async (req, res, next) => {
+	const id = req.params;
+	const type = await Type.findOne({ _id: id });
+
+	return res.status(200).json({
+		statusCode: 200,
+		statusMessage: 'success',
+		data: type,
+	});
+};
+
 export const updateType = async (req, res, next) => {
 	try {
 		const { id, name } = req.body;

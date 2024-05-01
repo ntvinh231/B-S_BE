@@ -127,3 +127,33 @@ export const getTransferContractById = async (req, res, next) => {
 		data: result,
 	});
 };
+
+export const deleteTransfer = async (req, res, next) => {
+	try {
+		const { id } = req.body;
+		const transfer = await TransferContract.findById(id);
+		if (!transfer) {
+			return res.status(200).json({
+				statusCode: 404,
+				statusMessage: 'failed',
+				message: 'Not found transfer.',
+			});
+		}
+
+		const result = await TransferContract.deleteOne({ _id: id });
+
+		return res.status(200).json({
+			statusCode: 200,
+			statusMessage: 'success',
+			message: 'Delete Success.',
+			data: result,
+		});
+	} catch (error) {
+		console.log(error);
+		return res.status(200).json({
+			statusCode: 400,
+			statusMessage: 'failed',
+			message: 'Delete failed.',
+		});
+	}
+};

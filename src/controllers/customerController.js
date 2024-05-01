@@ -134,3 +134,33 @@ export const updateCustomer = async (req, res, next) => {
 		data: result,
 	});
 };
+
+export const deleteCustomer = async (req, res, next) => {
+	try {
+		const { id } = req.body;
+		const customer = await Customer.findById(id);
+		if (!customer) {
+			return res.status(200).json({
+				statusCode: 404,
+				statusMessage: 'failed',
+				message: 'Not found customer.',
+			});
+		}
+
+		const result = await Customer.deleteOne({ _id: id });
+
+		return res.status(200).json({
+			statusCode: 200,
+			statusMessage: 'success',
+			message: 'Delete Success.',
+			data: result,
+		});
+	} catch (error) {
+		console.log(error);
+		return res.status(200).json({
+			statusCode: 400,
+			statusMessage: 'failed',
+			message: 'Delete failed.',
+		});
+	}
+};

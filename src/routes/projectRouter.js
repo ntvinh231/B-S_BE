@@ -14,6 +14,6 @@ const router = express.Router();
 router.post('/create', isLoggedIn, uploader.array('images', 10), createProject);
 router.get('/getAll', getAllProject);
 router.get('/getById/:id', getProjetById);
-router.patch('/update', isLoggedIn, updateProject);
+router.post('/update', isLoggedIn, uploader.array('images', 10), updateProject);
 router.delete('/delete', isLoggedIn, deleteProject);
 export default router;
